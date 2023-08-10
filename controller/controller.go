@@ -129,11 +129,13 @@ import (
 	"net/http"
 
 	"github.com/Garry028/mongoApi/database"
+	"github.com/Garry028/mongoApi/model"
 	"github.com/Garry028/mongoApi/service"
+	"github.com/gorilla/mux"
 )
 
 func GetMyAllMovies(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/x-www-form-urlencode")
 
 	client := database.Client
 	collection := client.Database("netflix").Collection("watchlist")
@@ -142,4 +144,53 @@ func GetMyAllMovies(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(movies)
 	// Handle errors if needed
+}
+
+func CreateMovie(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/x-www-form-urlencode")
+	w.Header().Set("Allow-Control-Allow-Methods", "POST")
+
+	var movie model.Netflix
+	_ = json.NewDecoder(r.Body).Decode(&movie)
+
+	client := database.Client
+	collection := client.Database("netflix").Collection("watchlist")
+	// call service InsertOneMovie
+	service.InsertOneMovie(collection, movie)
+	json.NewEncoder(w).Encode(movie)
+}
+
+func MarkAsWatched(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/x-www-form-urlencode")
+	w.Header().Set("Allow-Control-Allow-Methods", "POST")
+
+	params := mux.Vars(r)
+
+	// call UpdateOneMovie
+	client := database.Client
+	collection := client.Database("netflix").Collection("watchlist")
+	service.UpdateOneMovie(collection, params["id"])
+	json.NewEncoder(w).Encode(params["id"])
+}
+
+func DeleteMovie(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/x-www-form-urlencode")
+	w.Header().Set("Allow-Control-Allow-Methods", "DELETE")
+
+	params := mux.Vars(r)
+
+	client := database.Client
+	collection := client.Database("netflix").Collection("watchlist")
+	service.DeleteOneMovie(collection, params["id"])
+	json.NewEncoder(w).Encode(params["id"])
+}
+
+func DeleteAllMovies(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/x-www-form-urlencode")
+	w.Header().Set("Allow-Control-Allow-Methods", "DELETE")
+
+	client := database.Client
+	collection := client.Database("netflix").Collection("watchlist")
+	DeleteCount := service.DeleteAllMovies(collection)
+	json.NewEncoder(w).Encode(DeleteCount)
 }

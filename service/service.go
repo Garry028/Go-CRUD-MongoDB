@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/Garry028/mongoApi/model"
@@ -21,6 +22,7 @@ func InsertOneMovie(collection *mongo.Collection, movie model.Netflix) {
 
 // UpdateOneMovie updates a movie's "watched" status
 func UpdateOneMovie(collection *mongo.Collection, movieID string) {
+	// this function only updates false to true like if not watched then makes it watched
 	id, _ := primitive.ObjectIDFromHex(movieID)
 	filter := bson.M{"_id": id}
 	update := bson.M{"$set": bson.M{"watched": true}}
@@ -29,7 +31,7 @@ func UpdateOneMovie(collection *mongo.Collection, movieID string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Modified count:", result.ModifiedCount)
+	fmt.Println("Modified count:", result.ModifiedCount)
 }
 
 // DeleteOneMovie deletes a movie by ID

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -24,9 +25,8 @@ func main() {
 
 	// Initialize the database connection
 	database.InitDatabase(connectionString, databaseName)
+	fmt.Println("Server is getting started...")
+	r := router.SetupRoutes()
 
-	// Set up routes
-	router.SetupRoutes()
-
-	http.ListenAndServe(":8080", nil)
+	log.Fatal(http.ListenAndServe(":4000", r))
 }
